@@ -50,6 +50,48 @@ Finally, read the bit in the bottom of this document about init scripts, read
 the README, edit the configuration file and restart the server.
 
 
+Quick version for FreeBSD 10.0
+------------------------------
+
+Right now, forked-daapd does not play well with antlr version 3.5 or above, so
+go download antlr3 and libantlr3c version 3.4 from here:
+
+https://github.com/antlr/website-antlr3/blob/gh-pages/download/antlr-3.4-complete.jar
+https://github.com/antlr/website-antlr3/blob/gh-pages/download/C/libantlr3c-3.4.tar.gz
+
+Then copy the .jar to /usr/local/share/java, and create a shell script called
+antlr3 in /usr/local/bin. The script will be a wrapper, and you must put the 
+following in it:
+
+#!/bin/sh
+export CLASSPATH
+CLASSPATH=$CLASSPATH:/usr/local/share/java/antlr-3.4-complete.jar:/usr/share/java
+/usr/local/openjdk7/bin/java org.antlr.Tool $*
+
+Test that the command "antlr3" now works.
+
+As for libantlr3c, it's just a matter of unpacking the file, then ./configure,
+gmake and gmake install.
+
+Next you need to get libavl, which you can get from here:
+
+http://ftp.debian.org/debian/pool/main/liba/libavl
+
+Then unpack, and again run ./configure, gmake and gmake install.
+
+The install the rest of the depency packages with pkg. Now you are ready for the
+compilation! Here goes:
+
+ git clone https://github.com/ejurgensen/forked-daapd.git
+ cd forked-daapd
+ autoreconf -i
+ CC=cc CFLAG="-march=native -g -Ofast -pipe -I/usr/local/include -I/usr/include" LDFLAGS="-L/usr/local/lib/ -L/usr/lib" LIBUNISTRING_CFLAGS=-I/usr/include LIBUNISTRING_LIBS=-L/usr/lib ZLIB_CFLAGS=-I/usr/include ZLIB_LIBS=-L/usr/lib ./configure --build=i386-portbld-freebsd10.0 --with-oss4=/usr/local/lib/oss/include/sys
+ gmake
+ sudo gmake install
+
+
+
+
 Long version - requirements
 ---------------------------
 
