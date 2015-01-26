@@ -85,7 +85,7 @@ compilation! Here goes:
  git clone https://github.com/ejurgensen/forked-daapd.git
  cd forked-daapd
  autoreconf -i
- CC=cc CFLAGS="-march=native -g -Ofast -pipe -I/usr/local/include -I/usr/include" LDFLAGS="-L/usr/local/lib/ -L/usr/lib" LIBUNISTRING_CFLAGS=-I/usr/include LIBUNISTRING_LIBS=-L/usr/lib ZLIB_CFLAGS=-I/usr/include ZLIB_LIBS=-L/usr/lib ./configure --build=i386-portbld-freebsd10.0 --with-oss4=/usr/local/lib/oss/include/sys
+ CC=cc CFLAGS="-march=native -g -Ofast -pipe -I/usr/local/include -I/usr/include" LDFLAGS="-L/usr/local/lib -L/usr/lib" LIBUNISTRING_CFLAGS=-I/usr/include LIBUNISTRING_LIBS=-L/usr/lib ZLIB_CFLAGS=-I/usr/include ZLIB_LIBS=-L/usr/lib ./configure --build=i386-portbld-freebsd10.0 --with-oss4=/usr/local/lib/oss/include/sys
  gmake
  sudo gmake install
 
