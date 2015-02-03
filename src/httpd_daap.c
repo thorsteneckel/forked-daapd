@@ -822,7 +822,7 @@ daap_reply_server_info(struct evhttp_request *req, struct evbuffer *evbuf, char 
   dmap_add_int(content, "aeSV", apro);       // com.apple.itunes.music-sharing-version (determines if itunes shows share types)
 
   dmap_add_short(content, "ated", 7);        // daap.supportsextradata
-  dmap_add_short(content, "asgr", 3);        // daap.supportsgroups
+  dmap_add_short(content, "asgr", 1);        // daap.supportsgroups
 
 //  dmap_add_long(content, "asse", 0x80000); // unknown - used by iTunes
 
