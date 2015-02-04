@@ -2331,13 +2331,8 @@ daap_reply_extra_data(struct evhttp_request *req, struct evbuffer *evbuf, char *
 static int
 daap_stream(struct evhttp_request *req, struct evbuffer *evbuf, char **uri, struct evkeyvalq *query, const char *ua)
 {
-  struct daap_session *s;
   int id;
   int ret;
-
-  s = daap_session_find(req, query, evbuf);
-  if (!s)
-    return -1;
 
   ret = safe_atoi32(uri[3], &id);
   if (ret < 0)
@@ -2348,6 +2343,23 @@ daap_stream(struct evhttp_request *req, struct evbuffer *evbuf, char **uri, stru
   return ret;
 }
 
+static char *
+uri_relative(char *uri, const char *protocol)
+{
+  char *ret;
+
+  if (strncmp(uri, protocol, strlen(protocol)) != 0)
+    return NULL;
+
+  ret = strchr(uri + strlen(protocol), '/');
+  if (!ret)
+    {
+      DPRINTF(E_LOG, L_DAAP, "Malformed DAAP Request URI '%s'\n", uri);
+      return NULL;
+    }
+
+  return ret;
+}
 
 static char *
 daap_fix_request_uri(struct evhttp_request *req, char *uri)
@@ -2356,25 +2368,21 @@ daap_fix_request_uri(struct evhttp_request *req, char *uri)
 
   /* iTunes 9 gives us an absolute request-uri like
    *  daap://10.1.1.20:3689/server-info
+   * iTunes 12.1 gives us an absolute request-uri for streaming like
+   *  http://10.1.1.20:3689/databases/1/items/1.mp3
    */
 
-  if (strncmp(uri, "daap://", strlen("daap://")) != 0)
-    return uri;
-
-  /* Clear the proxy request flag set by evhttp
-   * due to the request URI being absolute.
-   * It has side-effects on Connection: keep-alive
-   */
-  req->flags &= ~EVHTTP_PROXY_REQUEST;
-
-  ret = strchr(uri + strlen("daap://"), '/');
-  if (!ret)
+  if ( (ret = uri_relative(uri, "daap://")) || (ret = uri_relative(uri, "http://")) )
     {
-      DPRINTF(E_LOG, L_DAAP, "Malformed DAAP Request URI '%s'\n", uri);
-      return NULL;
+      /* Clear the proxy request flag set by evhttp
+       * due to the request URI being absolute.
+       * It has side-effects on Connection: keep-alive
+       */
+      req->flags &= ~EVHTTP_PROXY_REQUEST;
+      return ret;
     }
 
-  return ret;
+  return uri;
 }
 
 
