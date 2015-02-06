@@ -814,8 +814,6 @@ daap_reply_server_info(struct evhttp_request *req, struct evbuffer *evbuf, char 
 	}
     }
 
-  ua = evhttp_find_header(headers, "User-Agent");
-
   dmap_add_int(content, "mstt", 200);
   dmap_add_int(content, "mpro", mpro);       // dmap.protocolversion
   dmap_add_string(content, "minm", name);    // dmap.itemname (server name)
@@ -825,11 +823,14 @@ daap_reply_server_info(struct evhttp_request *req, struct evbuffer *evbuf, char 
 
   dmap_add_short(content, "ated", 7);        // daap.supportsextradata
 
-  // iTunes 12.1 does not like that we announce support for groups
+  /* Sub-optimal user-agent sniffing to solve the problem that iTunes 12.1
+   * does not work if we announce support for groups.
+   */ 
+  ua = evhttp_find_header(headers, "User-Agent");
   if (ua && (strncmp(ua, "iTunes", strlen("iTunes")) == 0))
-    dmap_add_short(content, "asgr", 0);        // daap.supportsgroups
+    dmap_add_short(content, "asgr", 0);      // daap.supportsgroups (1=artists, 2=albums, 3=both)
   else
-    dmap_add_short(content, "asgr", 3);        // daap.supportsgroups
+    dmap_add_short(content, "asgr", 3);      // daap.supportsgroups (1=artists, 2=albums, 3=both)
 
 //  dmap_add_long(content, "asse", 0x80000); // unknown - used by iTunes
 
@@ -863,6 +864,9 @@ daap_reply_server_info(struct evhttp_request *req, struct evbuffer *evbuf, char 
 //  dmap_add_char(content, "msrs", 1);       // dmap.supportsresolve
 
   dmap_add_int(content, "msdc", 1);          // dmap.databasescount
+
+//  dmap_add_int(content, "mstc", );          // dmap.utctime
+//  dmap_add_int(content, "msto", );          // dmap.utcoffset
 
   // Create container
   dmap_add_container(evbuf, "msrv", EVBUFFER_LENGTH(content));
