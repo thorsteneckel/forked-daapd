@@ -1189,7 +1189,7 @@ raop_check_cseq(struct raop_session *rs, struct evrtsp_request *req)
 {
   /* customization */
   /* See https://github.com/ejurgensen/forked-daapd/issues/98 */
-  return 0
+  return 0;
   /* customization */
   
   int reply_cseq;
